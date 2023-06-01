@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from .mainView import firebase_collection
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('firebase-collection/', firebase_collection, name='firebase_collection'),
 ]
