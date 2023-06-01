@@ -1,0 +1,23 @@
+# Django #
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+db.sqlite3
+media/
+
+# Static files (usually collected by "collectstatic")
+staticfiles/
+
+# Site Specific #
+.env
+
+# IDE #
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore macOS specific files
+.DS_Store
