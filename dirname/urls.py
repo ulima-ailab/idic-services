@@ -16,11 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from .mainView import firebase_collection, get_emotions
+from .mainView import firebase_collection, get_emotions, start_message_generation
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('firebase-collection/', firebase_collection, name='firebase_collection'),
     path('get-emotions/', get_emotions, name='get_emotions'),
-
+    path('start-message-generation/', start_message_generation, name='start_message_generation'),
 ]

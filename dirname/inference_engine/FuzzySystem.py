@@ -113,10 +113,11 @@ class FuzzySystem:
         return max_cat
 
 
-myFS = FuzzySystem()
-in_data = {"stress": 5, "angry": 0.82, "disgusted": 0.2, "fearful": 0, "sad": 0, "happy": 0.98}
-out = myFS.process_input(in_data)
-print(get_fuzzyset_label(myFS.emotions_mf['angry'], in_data["angry"]))
-#print(myFS.get_fuzzyset_label(myFS.emotions_mf['disgusted'], 0.2))
-print(get_fuzzyset_label(myFS.emotions_mf['stress'], in_data["stress"]))
-print(out)
+if __name__ == '__main__':
+    myFS = FuzzySystem()
+    in_data = {"stress": 5, "angry": 0.82, "disgusted": 0.2, "fearful": 0, "sad": 0, "happy": 0.98}
+    out = myFS.process_input(in_data)
+    print(get_fuzzyset_label(myFS.emotions_mf['angry'], in_data["angry"]))
+    #print(myFS.get_fuzzyset_label(myFS.emotions_mf['disgusted'], 0.2))
+    print(get_fuzzyset_label(myFS.emotions_mf['stress'], in_data["stress"]))
+    print(out)
