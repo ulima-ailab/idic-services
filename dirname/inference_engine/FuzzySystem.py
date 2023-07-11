@@ -52,35 +52,74 @@ class FuzzySystem:
         # persuasion.view()
 
         rules = []
-        rules.append(ctrl.Rule(stress["no_stress"] & self.emotions_mf["angry"]["angry_no_present"], self.persuasion['LP1']))
-        rules.append(ctrl.Rule(stress["no_stress"] & self.emotions_mf["disgusted"]["disgusted_no_present"], self.persuasion['LP1']))
-        rules.append(ctrl.Rule(stress["no_stress"] & self.emotions_mf["fearful"]["fearful_no_present"], self.persuasion['LP1']))
-        rules.append(ctrl.Rule(stress["no_stress"] & self.emotions_mf["sad"]["sad_no_present"], self.persuasion['LP1']))
+        rules.append(ctrl.Rule(stress["no_stress"]
+                               & self.emotions_mf["angry"]["angry_no_present"]
+                               & self.emotions_mf["disgusted"]["disgusted_no_present"]
+                               & self.emotions_mf["fearful"]["fearful_no_present"]
+                               & self.emotions_mf["sad"]["sad_no_present"], self.persuasion['LP1']))
 
-        rules.append(ctrl.Rule(stress["no_stress"] & self.emotions_mf["angry"]["angry_present"], self.persuasion['LP3']))
-        rules.append(ctrl.Rule(stress["no_stress"] & self.emotions_mf["disgusted"]["disgusted_present"], self.persuasion['LP3']))
-        rules.append(ctrl.Rule(stress["no_stress"] & self.emotions_mf["fearful"]["fearful_present"], self.persuasion['LP3']))
-        rules.append(ctrl.Rule(stress["no_stress"] & self.emotions_mf["sad"]["sad_present"], self.persuasion['LP3']))
+        rules.append(ctrl.Rule(stress["no_stress"] & self.emotions_mf["angry"]["angry_present"]
+                               & self.emotions_mf["disgusted"]["disgusted_no_present"]
+                               & self.emotions_mf["fearful"]["fearful_no_present"]
+                               & self.emotions_mf["sad"]["sad_no_present"], self.persuasion['LP3']))
+        rules.append(ctrl.Rule(stress["no_stress"] & self.emotions_mf["disgusted"]["disgusted_present"]
+                               & self.emotions_mf["angry"]["angry_no_present"]
+                               & self.emotions_mf["fearful"]["fearful_no_present"]
+                               & self.emotions_mf["sad"]["sad_no_present"], self.persuasion['LP3']))
+        rules.append(ctrl.Rule(stress["no_stress"] & self.emotions_mf["fearful"]["fearful_present"]
+                               & self.emotions_mf["angry"]["angry_no_present"]
+                               & self.emotions_mf["disgusted"]["disgusted_no_present"]
+                               & self.emotions_mf["sad"]["sad_no_present"], self.persuasion['LP3']))
+        rules.append(ctrl.Rule(stress["no_stress"] & self.emotions_mf["sad"]["sad_present"]
+                               & self.emotions_mf["angry"]["angry_no_present"]
+                               & self.emotions_mf["disgusted"]["disgusted_no_present"]
+                               & self.emotions_mf["fearful"]["fearful_no_present"], self.persuasion['LP3']))
 
-        rules.append(ctrl.Rule(stress["mild_stress"] & self.emotions_mf["angry"]["angry_no_present"], self.persuasion['LP0']))
-        rules.append(ctrl.Rule(stress["mild_stress"] & self.emotions_mf["disgusted"]["disgusted_no_present"], self.persuasion['LP0']))
-        rules.append(ctrl.Rule(stress["mild_stress"] & self.emotions_mf["fearful"]["fearful_no_present"], self.persuasion['LP0']))
-        rules.append(ctrl.Rule(stress["mild_stress"] & self.emotions_mf["sad"]["sad_no_present"], self.persuasion['LP0']))
+        rules.append(ctrl.Rule(stress["mild_stress"]
+                               & self.emotions_mf["angry"]["angry_no_present"]
+                               & self.emotions_mf["disgusted"]["disgusted_no_present"]
+                               & self.emotions_mf["fearful"]["fearful_no_present"]
+                               & self.emotions_mf["sad"]["sad_no_present"], self.persuasion['LP0']))
 
-        rules.append(ctrl.Rule(stress["mild_stress"] & self.emotions_mf["angry"]["angry_present"], self.persuasion['LP2']))
-        rules.append(ctrl.Rule(stress["mild_stress"] & self.emotions_mf["disgusted"]["disgusted_present"], self.persuasion['LP2']))
-        rules.append(ctrl.Rule(stress["mild_stress"] & self.emotions_mf["fearful"]["fearful_present"], self.persuasion['LP2']))
-        rules.append(ctrl.Rule(stress["mild_stress"] & self.emotions_mf["sad"]["sad_present"], self.persuasion['LP2']))
+        rules.append(ctrl.Rule(stress["mild_stress"] & self.emotions_mf["angry"]["angry_present"]
+                               & self.emotions_mf["disgusted"]["disgusted_no_present"]
+                               & self.emotions_mf["fearful"]["fearful_no_present"]
+                               & self.emotions_mf["sad"]["sad_no_present"], self.persuasion['LP2']))
+        rules.append(ctrl.Rule(stress["mild_stress"] & self.emotions_mf["disgusted"]["disgusted_present"]
+                               & self.emotions_mf["angry"]["angry_no_present"]
+                               & self.emotions_mf["fearful"]["fearful_no_present"]
+                               & self.emotions_mf["sad"]["sad_no_present"], self.persuasion['LP2']))
+        rules.append(ctrl.Rule(stress["mild_stress"] & self.emotions_mf["fearful"]["fearful_present"]
+                               & self.emotions_mf["angry"]["angry_no_present"]
+                               & self.emotions_mf["disgusted"]["disgusted_no_present"]
+                               & self.emotions_mf["sad"]["sad_no_present"], self.persuasion['LP2']))
+        rules.append(ctrl.Rule(stress["mild_stress"] & self.emotions_mf["sad"]["sad_present"]
+                               & self.emotions_mf["angry"]["angry_no_present"]
+                               & self.emotions_mf["disgusted"]["disgusted_no_present"]
+                               & self.emotions_mf["fearful"]["fearful_no_present"], self.persuasion['LP2']))
 
-        rules.append(ctrl.Rule(stress["high_stress"] & self.emotions_mf["angry"]["angry_no_present"], self.persuasion['LP3']))
-        rules.append(ctrl.Rule(stress["high_stress"] & self.emotions_mf["disgusted"]["disgusted_no_present"], self.persuasion['LP3']))
-        rules.append(ctrl.Rule(stress["high_stress"] & self.emotions_mf["fearful"]["fearful_no_present"], self.persuasion['LP3']))
-        rules.append(ctrl.Rule(stress["high_stress"] & self.emotions_mf["sad"]["sad_no_present"], self.persuasion['LP3']))
+        rules.append(ctrl.Rule(stress["high_stress"]
+                               & self.emotions_mf["angry"]["angry_no_present"]
+                               & self.emotions_mf["disgusted"]["disgusted_no_present"]
+                               & self.emotions_mf["fearful"]["fearful_no_present"]
+                               & self.emotions_mf["sad"]["sad_no_present"], self.persuasion['LP3']))
 
-        rules.append(ctrl.Rule(stress["high_stress"] & self.emotions_mf["angry"]["angry_present"], self.persuasion['LP2']))
-        rules.append(ctrl.Rule(stress["high_stress"] & self.emotions_mf["disgusted"]["disgusted_present"], self.persuasion['LP2']))
-        rules.append(ctrl.Rule(stress["high_stress"] & self.emotions_mf["fearful"]["fearful_present"], self.persuasion['LP2']))
-        rules.append(ctrl.Rule(stress["high_stress"] & self.emotions_mf["sad"]["sad_present"], self.persuasion['LP2']))
+        rules.append(ctrl.Rule(stress["high_stress"] & self.emotions_mf["angry"]["angry_present"]
+                               & self.emotions_mf["disgusted"]["disgusted_no_present"]
+                               & self.emotions_mf["fearful"]["fearful_no_present"]
+                               & self.emotions_mf["sad"]["sad_no_present"], self.persuasion['LP2']))
+        rules.append(ctrl.Rule(stress["high_stress"] & self.emotions_mf["disgusted"]["disgusted_present"]
+                               & self.emotions_mf["angry"]["angry_no_present"]
+                               & self.emotions_mf["fearful"]["fearful_no_present"]
+                               & self.emotions_mf["sad"]["sad_no_present"], self.persuasion['LP2']))
+        rules.append(ctrl.Rule(stress["high_stress"] & self.emotions_mf["fearful"]["fearful_present"]
+                               & self.emotions_mf["angry"]["angry_no_present"]
+                               & self.emotions_mf["disgusted"]["disgusted_no_present"]
+                               & self.emotions_mf["sad"]["sad_no_present"], self.persuasion['LP2']))
+        rules.append(ctrl.Rule(stress["high_stress"] & self.emotions_mf["sad"]["sad_present"]
+                               & self.emotions_mf["angry"]["angry_no_present"]
+                               & self.emotions_mf["disgusted"]["disgusted_no_present"]
+                               & self.emotions_mf["fearful"]["fearful_no_present"], self.persuasion['LP2']))
 
         self.ctrl_sys = ctrl.ControlSystem(rules)
 
@@ -107,6 +146,7 @@ class FuzzySystem:
         for c in self.ctrl_sys.consequents:
             for term in c.terms.values():
                 mf_val = term.membership_value[result]
+                print(term.label, mf_val)
                 if max_val_cat <= mf_val:
                     max_val_cat = mf_val
                     max_cat = term.label
@@ -115,9 +155,13 @@ class FuzzySystem:
 
 if __name__ == '__main__':
     myFS = FuzzySystem()
-    in_data = {"stress": 5, "angry": 0.82, "disgusted": 0.2, "fearful": 0, "sad": 0, "happy": 0.98}
+    in_data = {"stress": 1, "angry": 0.2, "disgusted": 0.2, "fearful": 0.90, "sad": 0.05, "happy": 0.98}
     out = myFS.process_input(in_data)
-    print(get_fuzzyset_label(myFS.emotions_mf['angry'], in_data["angry"]))
-    #print(myFS.get_fuzzyset_label(myFS.emotions_mf['disgusted'], 0.2))
+    print("========================")
     print(get_fuzzyset_label(myFS.emotions_mf['stress'], in_data["stress"]))
+    print(get_fuzzyset_label(myFS.emotions_mf['angry'], in_data["angry"]))
+    print(get_fuzzyset_label(myFS.emotions_mf['disgusted'], in_data["disgusted"]))
+    print(get_fuzzyset_label(myFS.emotions_mf['fearful'], in_data["fearful"]))
+    print(get_fuzzyset_label(myFS.emotions_mf['sad'], in_data["sad"]))
+
     print(out)
