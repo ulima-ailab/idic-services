@@ -27,34 +27,3 @@ def preprocess_data(input_data):
         result[mean_df["emotion"][ind]] = mean_df["value"][ind]
     print(result)
     return result
-
-
-class DataManager:
-    def __init__(self):
-        print("Se crea el modelo")
-
-    def get_temp_data(self):
-        import random
-        cols = ["p_stress", "f_angry", "f_disgusted", "f_fearful", "f_happy", "f_sad", "f_surprised", "f_neutral"]
-        size = 15
-        p_stress = [random.randint(1, 5) for i in range(0, size)]
-        f_angry = [random.random() for i in range(0, size)]
-        f_disgusted = [random.random() for i in range(0, size)]
-        f_fearful = [random.random() for i in range(0, size)]
-        f_happy = [random.random() for i in range(0, size)]
-        f_sad = [random.random() for i in range(0, size)]
-        f_surprised = [random.random() for i in range(0, size)]
-        f_neutral = [random.random() for i in range(0, size)]
-        df1 = pd.DataFrame(np.array([p_stress, f_angry, f_disgusted, f_fearful, f_happy, f_sad, f_surprised, f_neutral]), columns=cols)
-        return df1
-
-    def train_model(self):
-        data = self.get_temp_data()
-        print(data)
-        return {"result": True}
-
-
-if __name__ == '__main__':
-    model = DataManager()
-    out = model.train_model()
-    print(out)

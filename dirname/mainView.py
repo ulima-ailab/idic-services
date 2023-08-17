@@ -1,4 +1,5 @@
 import datetime
+import numpy as np
 from firebase_admin import firestore
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -6,6 +7,8 @@ from django.views.decorators.csrf import csrf_exempt
 import dirname.managers.firestoreManager as fsm
 import dirname.managers.DataManager as dm
 from dirname.inference_engine.FuzzySystem import FuzzySystem
+from dirname.inference_engine.enfs.enfs import ENFS
+from dirname.inference_engine.models import *
 
 
 def firebase_collection(request):
@@ -24,6 +27,7 @@ def firebase_collection(request):
     # Return the collection data as a JSON response
     return JsonResponse(data, safe=False)
 
+
 @csrf_exempt
 def get_emotions(request):
     user_id = request.POST.get('userId')
@@ -40,8 +44,9 @@ def get_emotions(request):
     # Return the collection data as a JSON response
     return JsonResponse(data, safe=False)
 
+
 @csrf_exempt
-def start_message_generation(request):
+def start_message_generation(request, model_id):
     WIN_SIZE_MINS = 2 * 60 * 24
     user_id = request.POST.get('userId')
     current_time = request.POST.get('currentTime')
@@ -53,10 +58,34 @@ def start_message_generation(request):
 
     data = fsm.db_get_emotions(user_id, start_timestamp, end_timestamp)
     data = dm.preprocess_data(data)
+    result = {"emotion_data": data}
 
-    fis = FuzzySystem()
-    persuasion_level = fis.process_input(data)
+    if model_id == FUZZY_MODEL:
+        model = FuzzySystem()
+    elif model_id == ENFS_MODEL:
+        model = ENFS()
+        model.load_model(ENFS_PATH)
+        data = np.array([np.array(list(data.values()))])
+    persuasion_level = model.process_input(data)
+    result["persuasion_level"] = persuasion_level
     print("SERVER: " + persuasion_level)
 
     # Return the collection data as a JSON response
-    return JsonResponse({"emotion_data": data, "persuasion_level": persuasion_level}, safe=False)
+    return JsonResponse(result, safe=False)
+
+
+@csrf_exempt
+def train_model(request, model_id):
+    print(model_id)
+    import pandas as pd
+    import numpy as np
+    data = fsm.db_get_training_data()
+    data = pd.read_csv(TRAINING_CSV_PATH)
+    X = np.array(data[["stress", "angry", "disgusted", "fearful", "happy", "sad", "surprised", "neutral"]])
+    y = np.array(data['persuasion_level'])
+    if model_id == ENFS_MODEL:
+        model = ENFS()
+        model.train_model(X, y, 8, 15, ENFS_PATH)
+    elif model_id == KMEANS_MODEL:
+        print(model_id)
+    return JsonResponse({"message": "Model trained"})

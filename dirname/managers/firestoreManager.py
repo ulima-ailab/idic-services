@@ -14,3 +14,17 @@ def db_get_emotions(user_id, start_timestamp, end_timestamp):
         data.append(doc.to_dict())
 
     return data
+
+
+def db_get_training_data():
+    db = firestore.client()
+
+    # Fetch the collection data from Firebase
+    docs = db.collection('TrainingData').get()
+
+    # Create a list to store the document data
+    data = []
+    for doc in docs:
+        data.append(doc.to_dict())
+
+    return data
