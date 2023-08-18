@@ -25,5 +25,5 @@ def preprocess_data(input_data):
     result = {}
     for ind in mean_df.index:
         result[mean_df["emotion"][ind]] = mean_df["value"][ind]
-    print(result)
+    # print(result)
     return result

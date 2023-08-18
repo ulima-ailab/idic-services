@@ -1,4 +1,5 @@
 from firebase_admin import firestore
+import pandas as pd
 
 
 def db_get_emotions(user_id, start_timestamp, end_timestamp):
@@ -18,13 +19,9 @@ def db_get_emotions(user_id, start_timestamp, end_timestamp):
 
 def db_get_training_data():
     db = firestore.client()
-
-    # Fetch the collection data from Firebase
     docs = db.collection('TrainingData').get()
-
     # Create a list to store the document data
     data = []
     for doc in docs:
         data.append(doc.to_dict())
-
-    return data
+    return pd.DataFrame.from_dict(data)

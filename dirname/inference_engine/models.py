@@ -1,11 +1,14 @@
 import dirname.settings as settings
 
+FEATURES_COLS = ["stress", "angry", "disgusted", "fearful", "happy", "sad", "surprised", "neutral"]
+LABEL_COL = "persuasion_level"
+
 FUZZY_MODEL = "fuzzy"
-KMEANS_MODEL = "kmeans"
+SVM_MODEL = "svm"
 ENFS_MODEL = "enfs"
 
 MODELS_PATH = settings.STATIC_URL + "models/"
 ENFS_PATH = MODELS_PATH + "enfs_config"
-KMEANS_PATH = MODELS_PATH + "kmeans_config.txt"
+SVM_PATH = MODELS_PATH + "svm_config"
 
 TRAINING_CSV_PATH = settings.STATIC_URL + "training_data.csv"

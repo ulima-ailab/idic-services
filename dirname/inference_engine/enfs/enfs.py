@@ -1,5 +1,7 @@
 import time
 import matplotlib.pyplot as plt
+from sklearn.metrics import accuracy_score
+
 from .diffevo import differential_evolution
 from .anfis import ANFIS
 from .fobj import *
@@ -64,6 +66,22 @@ class ENFS:
         """
         print('Best fitness: %f' % result[-1][1])
 
+    def test_model(self, X, y):
+        best_pred = self.fis.infer(X)
+        accuracy = accuracy_score(
+            y_true=y,
+            y_pred=best_pred,
+            normalize=True
+        )
+        print("")
+        print(f"El accuracy de test es: {100 * accuracy}%")
+
+        # Plots the real and predicted one series
+        plt.plot(y)
+        plt.plot(best_pred)
+        plt.legend(['Real', 'Predicted'])
+        plt.show()
+
     def load_model(self, model_path):
         with open(model_path + ".txt") as f:
             dim_x, n_rules = f.readlines()
@@ -75,12 +93,6 @@ class ENFS:
         self.fis.setmfs(best_mus, best_sigmas, best_y)
         print("Model loaded")
 
-    def process_input(self, data, y=None):
+    def process_input(self, data):
         best_pred = self.fis.infer(data)
-        if y is not None:
-            # Plots the real and predicted one series
-            plt.plot(y)
-            plt.plot(best_pred)
-            plt.legend(['Real', 'Predicted'])
-            plt.show()
         return 'LP' + str(int(round(best_pred[0], ndigits=0)))
