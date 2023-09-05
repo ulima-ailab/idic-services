@@ -16,12 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from .mainView import firebase_collection, get_emotions, start_message_generation, train_model
+from .mainView import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('firebase-collection/', firebase_collection, name='firebase_collection'),
     path('get-emotions/', get_emotions, name='get_emotions'),
-    path('start-message-generation/<str:model_id>/', start_message_generation, name='start_message_generation'),
+    path('start-message-generation/', start_message_generation, name='start_message_generation'),
     path('train-model/<str:model_id>/', train_model, name='train_model'),
+    path('upload-training-data/', upload_training_data, name='upload_training_data'),
 ]

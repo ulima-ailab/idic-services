@@ -12,6 +12,10 @@ from dirname.inference_engine.SVMModel import SVMmodel
 from dirname.inference_engine.enfs.enfs import ENFS
 from dirname.inference_engine.models import *
 
+import os
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv(), override=True)
+
 
 def firebase_collection(request):
     # Access the Firestore database
@@ -48,12 +52,27 @@ def get_emotions(request):
 
 
 @csrf_exempt
-def start_message_generation(request, model_id):
-    WIN_SIZE_MINS = 2 * 60 * 24
+def upload_training_data(request):
+    data_df = pd.read_csv(TRAINING_CSV_PATH, index_col=0)
+    data = data_df.to_dict("records")
+    db = firestore.client()
+    for val in data:
+        db.collection("TrainingData").add(val)
+    return JsonResponse({"message": "Data was inserted", "data": data})
+
+
+def generate_message(persuasion_level):
+    # Infer the modality
+    # Generate message object
+    return {"type": "visual", "value": "red", "time": 3}
+
+
+@csrf_exempt
+def start_message_generation(request):
     user_id = request.POST.get('userId')
     current_time = request.POST.get('currentTime')
     end_timestamp = datetime.datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S')
-    start_timestamp = end_timestamp - datetime.timedelta(minutes=WIN_SIZE_MINS)
+    start_timestamp = end_timestamp - datetime.timedelta(minutes=int(os.environ.get('MINS_FOR_PERSUASION_INFERENCE')))
 
     print("StartTime", start_timestamp)
     print("EndTime", end_timestamp)
@@ -61,6 +80,8 @@ def start_message_generation(request, model_id):
     data = fsm.db_get_emotions(user_id, start_timestamp, end_timestamp)
     data = dm.preprocess_data(data)
     result = {"emotion_data": data}
+
+    model_id = os.environ.get('MODEL_PERSUASION_INFERENCE')
 
     if model_id == FUZZY_MODEL:
         model = FuzzySystem()
@@ -77,6 +98,8 @@ def start_message_generation(request, model_id):
         data = np.array(tmp[FEATURES_COLS])
     persuasion_level = model.process_input(data)
     result[LABEL_COL] = persuasion_level
+
+    result["message"] = generate_message(persuasion_level)
     print("SERVER: " + persuasion_level)
 
     # Return the collection data as a JSON response
@@ -86,9 +109,6 @@ def start_message_generation(request, model_id):
 @csrf_exempt
 def train_model(request, model_id):
     data = fsm.db_get_training_data()
-    #print(data)
-    data = pd.read_csv(TRAINING_CSV_PATH)
-    #print(data)
     X = np.array(data[FEATURES_COLS])
     y = np.array(data[LABEL_COL])
     if model_id == ENFS_MODEL:
