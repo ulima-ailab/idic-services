@@ -134,7 +134,7 @@ class FuzzySystem:
             if key in self.antecedents_labels:
                 result.input[key] = input_data[key]
         result.compute()
-        result.print_state()
+        # result.print_state()
 
         crisp_val = result.output['persuasion_level']
         print("====== Output: " + str(crisp_val))

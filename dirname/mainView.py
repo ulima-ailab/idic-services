@@ -64,7 +64,16 @@ def upload_training_data(request):
 def generate_message(persuasion_level):
     # Infer the modality
     # Generate message object
-    return {"type": "visual", "value": "red", "time": 3}
+    import random
+    num = random.random()
+    if num > 0.65:
+        return {"type": "visual", "value": "red", "time": 3}
+    elif num > 0.3:
+        return {"type": "audio",
+                "value": "https://drive.google.com/uc?export=download&id=13lrUpMAiqiznF9kk3LULLWtH3nf3ioAz", "time": 2}
+    else:
+        return {"type": "speech",
+                "value": "Por favor toma un descanso", "time": 1}
 
 
 @csrf_exempt
