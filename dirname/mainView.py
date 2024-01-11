@@ -96,13 +96,13 @@ def start_message_generation(request):
         model = FuzzySystem()
     elif model_id == ENFS_MODEL:
         model = ENFS()
-        model.load_model(ENFS_PATH)
+        model.load_model(MODELS_PATH + "enfs_config")
         tmp = pd.DataFrame([data])
         data = np.array(tmp[FEATURES_COLS])
         data = np.array([data])
     elif model_id == SVM_MODEL:
         model = SVMmodel()
-        model.load_model(SVM_PATH)
+        model.load_model(MODELS_PATH + "svm_config")
         tmp = pd.DataFrame([data])
         data = np.array(tmp[FEATURES_COLS])
     persuasion_level = model.process_input(data)
@@ -122,10 +122,10 @@ def train_model(request, model_id):
     y = np.array(data[LABEL_COL])
     if model_id == ENFS_MODEL:
         model = ENFS()
-        model.train_model(X, y, 8, 15, ENFS_PATH)
+        model.train_model(X, y, 8, 15, MODELS_PATH + "enfs_config")
         # model.test_model(X, y)
     elif model_id == SVM_MODEL:
         model = SVMmodel()
-        model.train_model(X, y, SVM_PATH)
+        model.train_model(X, y, MODELS_PATH + "svm_config")
         # model.test_model(X, y)
     return JsonResponse({"message": "Model trained"})

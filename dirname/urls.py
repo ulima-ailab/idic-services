@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from .mainView import *
-import dirname.traningCallbacks as trainingCalls
+import dirname.interruptibilityCallbacks as interruptibilityCalls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,5 +27,6 @@ urlpatterns = [
     path('train-model/<str:model_id>/', train_model, name='train_model'),
     path('upload-training-data/', upload_training_data, name='upload_training_data'),
 
-    path('firebase/interruptibility/training/raw', trainingCalls.export_interruptibility_raw, name='export_interruptibility_data'),
+    path('firebase/interruptibility/training/raw', interruptibilityCalls.export_interruptibility_raw, name='export_interruptibility_data'),
+    path('train/<str:model_id>/interruptibility', interruptibilityCalls.train_for_interruptibility, name='train_for_interruptibility'),
 ]
