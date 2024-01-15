@@ -71,9 +71,9 @@ def export_interruptibility_raw(request):
     return JsonResponse({"message": "Data exported"}, safe=False)
 
 
-def get_training_data():
+def get_training_data(filename):
     # After manual cleaning of data: removing null rows and remove when the E4 was not connected.
-    df_data = pd.read_csv(settings.STATIC_URL + "raw_interruptibility_data_processed.csv", delimiter=";")
+    df_data = pd.read_csv(filename, delimiter=";")
     df_data = df_data[df_data["id_user"].notnull()]
     # Eliminamos esto mas para entrenar con todos los campos
     df_data = df_data[df_data["id_user_1"].notnull()]
@@ -98,9 +98,14 @@ def get_training_data():
 
 @csrf_exempt
 def train_for_interruptibility(request, model_id):
-    data = get_training_data()
-    #COLS_TRAIN = [stress;reaction_time;id_user;physical_activity;airplane_mode;surrounding_sound;screen;battery_level;completion_time;day_of_week;mobile_data;delivery_time;wifi;interruptibility_level;stress_level;charge_status;notification_ringtone;current_activity;priority_current_activity;id_user_1;attention_level;emotions;timestamp;interaction_others]
-    COLS_TRAIN = ["stress", "physical_activity", "airplane_mode", "surrounding_sound", "screen", "battery_level", "mobile_data", "wifi", "stress_level", "charge_status", "notification_ringtone", "current_activity", "priority_current_activity", "attention_level"]
+    filename = settings.STATIC_URL + "raw_interruptibility_data_processed_all.csv"
+    data = get_training_data(filename)
+
+    print("NO INTERRUP" + str(len(data[data['label'] == 0])))
+    print("SI INTERRUP" + str(len(data[data['label'] == 1])))
+
+    # COLS_TRAIN = [stress;reaction_time;id_user;physical_activity;airplane_mode;surrounding_sound;screen;battery_level;completion_time;day_of_week;mobile_data;delivery_time;wifi;interruptibility_level;stress_level;charge_status;notification_ringtone;current_activity;priority_current_activity;id_user_1;attention_level;emotions;timestamp;interaction_others]
+    COLS_TRAIN = ["stress", "physical_activity", "airplane_mode", "surrounding_sound", "screen", "battery_level", "mobile_data", "wifi", "stress_level", "charge_status", "notification_ringtone", "attention_level", 'fearful', 'disgusted', 'angry', 'sad', 'surprised', 'neutral', 'happy']
     COL_LABEL = "label"
     X = np.array(data[COLS_TRAIN])
     y = np.array(data[COL_LABEL])

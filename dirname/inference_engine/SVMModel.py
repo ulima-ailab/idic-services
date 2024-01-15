@@ -4,7 +4,7 @@ from joblib import dump, load
 
 from sklearn.svm import SVC
 from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, ConfusionMatrixDisplay
 
 
 class SVMmodel:
@@ -54,11 +54,35 @@ class SVMmodel:
         print("")
         print(f"El accuracy de test es: {100 * accuracy}%")
 
+        recall = recall_score(y_true=y, y_pred=best_pred)
+        print("Recall: ", recall)
+
+        precision = precision_score(y_true=y, y_pred=best_pred)
+        print("Precision: ", precision)
+
+        f1 = f1_score(y_true=y, y_pred=best_pred)
+        print("F1-Score: ", f1)
+
+        from sklearn.metrics import classification_report
+        print(classification_report(y_true=y, y_pred=best_pred))
+
+        self.show_confusion_matrix(y, best_pred)
+
         # Plots the real and predicted one series
         plt.plot(y)
         plt.plot(best_pred)
         plt.legend(['Real', 'Predicted'])
         plt.show()
+
+
+    def show_confusion_matrix(self, y, y_pred):
+        import matplotlib.pyplot as plt
+
+        cm = confusion_matrix(y, y_pred)
+        cm_display = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=[False, True])
+        cm_display.plot()
+        plt.show()
+
 
     def load_model(self, model_path):
         # Somewhere else
