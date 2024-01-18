@@ -96,6 +96,39 @@ def get_training_data(filename):
     return df_data
 
 
+def analyze_with_pca(data):
+    from sklearn.decomposition import PCA
+    from sklearn.pipeline import make_pipeline
+    from sklearn.preprocessing import StandardScaler
+    import matplotlib.pyplot as plt
+
+    # Entrenamiento modelo PCA con escalado de los datos
+    # ==============================================================================
+    pca_pipe = make_pipeline(StandardScaler(), PCA())
+    pca_pipe.fit(data)
+
+    # Se extrae el modelo entrenado del pipeline
+    modelo_pca = pca_pipe.named_steps['pca']
+
+    # Se combierte el array a dataframe para añadir nombres a los ejes.
+    df = pd.DataFrame(
+        data    = modelo_pca.components_,
+        columns = data.columns,
+        index   = [i for i in range(0,19)]# ['PC1', 'PC2', 'PC3', 'PC4']
+    )
+
+    # Heatmap componentes
+    # ==============================================================================
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4, 2))
+    componentes = modelo_pca.components_
+    plt.imshow(componentes.T, cmap='bwr', aspect='auto')
+    plt.yticks(range(len(data.columns)), data.columns)
+    plt.xticks(range(len(data.columns)), np.arange(modelo_pca.n_components_) + 1)
+    plt.grid(False)
+    plt.colorbar()
+
+
+
 @csrf_exempt
 def train_for_interruptibility(request, model_id):
     filename = settings.STATIC_URL + "raw_interruptibility_data_processed_all.csv"
@@ -106,6 +139,14 @@ def train_for_interruptibility(request, model_id):
 
     # COLS_TRAIN = [stress;reaction_time;id_user;physical_activity;airplane_mode;surrounding_sound;screen;battery_level;completion_time;day_of_week;mobile_data;delivery_time;wifi;interruptibility_level;stress_level;charge_status;notification_ringtone;current_activity;priority_current_activity;id_user_1;attention_level;emotions;timestamp;interaction_others]
     COLS_TRAIN = ["stress", "physical_activity", "airplane_mode", "surrounding_sound", "screen", "battery_level", "mobile_data", "wifi", "stress_level", "charge_status", "notification_ringtone", "attention_level", 'fearful', 'disgusted', 'angry', 'sad', 'surprised', 'neutral', 'happy']
+    # F1: 0 - 0.31 , 1 - 0.77 (acc: 0.66)
+    # COLS_TRAIN = ["stress", "physical_activity", "surrounding_sound", "screen", "stress_level", "notification_ringtone", "attention_level"]
+    # F1: 0 - 0.46 , 1 - 0.77 (acc: 0.68)
+    #COLS_TRAIN = ["stress", "physical_activity", "screen", "stress_level", "notification_ringtone", "attention_level"]
+    # F1: 0 -  , 1 -  (acc: )
+
+    analyze_with_pca(data[COLS_TRAIN])
+
     COL_LABEL = "label"
     X = np.array(data[COLS_TRAIN])
     y = np.array(data[COL_LABEL])
