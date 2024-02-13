@@ -92,9 +92,7 @@ def start_message_generation(request):
 
     model_id = os.environ.get('MODEL_PERSUASION_INFERENCE')
 
-    if model_id == FUZZY_MODEL:
-        model = FuzzySystem()
-    elif model_id == ENFS_MODEL:
+    if model_id == ENFS_MODEL:
         model = ENFS()
         model.load_model(MODELS_PATH + "enfs_config")
         tmp = pd.DataFrame([data])
@@ -105,9 +103,14 @@ def start_message_generation(request):
         model.load_model(MODELS_PATH + "svm_config")
         tmp = pd.DataFrame([data])
         data = np.array(tmp[FEATURES_COLS])
+    else:
+        model = FuzzySystem()
+
+    # inferring the persuasion level
     persuasion_level = model.process_input(data)
     result[LABEL_COL] = persuasion_level
 
+    # generating the corresponding message
     result["message"] = generate_message(persuasion_level)
     print("SERVER: " + persuasion_level)
 
