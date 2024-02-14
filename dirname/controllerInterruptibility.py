@@ -1,10 +1,14 @@
 import numpy as np
 import pandas as pd
+import os
+from datetime import datetime
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 import dirname.managers.firestoreManager as fsm
-from dirname.inference_engine.models import *
+from dirname.config_vars import *
+
+from joblib import load
 
 
 @csrf_exempt
@@ -69,4 +73,18 @@ def export_interruptibility_raw(request):
     return JsonResponse({"message": "Data exported"}, safe=False)
 
 
-def
+@csrf_exempt
+def predict(request):
+    user_id = request.POST.get('userId')
+    curr_date = request.POST.get('currentTime') if request.POST.get('currentTime') else datetime.now()
+    curr_timestamp = datetime.strptime(curr_date, '%Y-%m-%d %H:%M:%S %Z%z')
+    print("CurrentTime", curr_timestamp)
+
+    data = fsm.db_get_interruptibility_data(user_id, curr_timestamp)
+    model = load(MODELS_PATH + os.environ.get('MODEL_INTERRUPTIBILITY_FILE'))
+    scaler = load(MODELS_PATH + os.environ.get('SCALER_INTERRUPTIBILITY_FILE'))
+    print("Model loaded")
+
+    pred = 0
+    return JsonResponse({"message": "Prediction was successful", "data": pred})
+

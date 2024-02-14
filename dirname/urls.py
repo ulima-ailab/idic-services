@@ -28,4 +28,5 @@ urlpatterns = [
     path('upload-training-data/', upload_training_data, name='upload_training_data'),
 
     path('firebase/interruptibility/training/raw', interruptibilityCalls.export_interruptibility_raw, name='export_interruptibility_data'),
+    path('interruptibility/predict', interruptibilityCalls.predict, name='predict_interruptibility'),
 ]

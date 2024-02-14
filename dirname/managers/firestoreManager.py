@@ -1,5 +1,7 @@
 from firebase_admin import firestore
 import pandas as pd
+from datetime import datetime, timedelta
+import pytz
 
 
 def db_get_documents_from_collection(collection_name):
@@ -35,3 +37,48 @@ def db_get_training_data():
     for doc in docs:
         data.append(doc.to_dict())
     return pd.DataFrame.from_dict(data)
+
+
+def db_get_documents_by_range_time(collection_name, user_id, start_timestamp, end_timestamp, ascending=True):
+    db = firestore.client()
+    docs = (db.collection(collection_name).where('id_user', '==', user_id).where('timestamp', '>=', start_timestamp)
+            .where('timestamp', '<=', end_timestamp).get())
+    data = []
+    for doc in docs:
+        data.append(doc.to_dict())
+    df = pd.DataFrame(data)
+    if "timestamp" in df.columns:
+        df = df.sort_values(by="timestamp", ascending=ascending)
+    return df
+
+
+def db_get_interruptibility_data(user_id, current_timestamp):
+    db = firestore.client()
+    start_timestamp = current_timestamp - timedelta(minutes=int(5))
+    print("STARTTT", start_timestamp)
+
+    app_cols = ["surrounding_sound", "stress_level", "physical_activity"]
+    web_cols = ["attention_level"]
+    emo_cols = ["neutral", "sad", "disgusted", "stress", "happy"]
+
+    final_data = {}
+
+    # Recovering data from the context_app (android)
+    df = db_get_documents_by_range_time("Context_app", user_id, start_timestamp, current_timestamp, False)
+    if len(df.columns) > 0:
+        df = df[app_cols]
+        final_data.update(df.to_dict('records')[0])
+
+    # Recovering data from context_web
+    df = db_get_documents_by_range_time("Context_web", user_id, start_timestamp, current_timestamp, False)
+    print(df)
+    if len(df.columns) > 0:
+        df = df[web_cols]
+        final_data.update(df.to_dict('records')[0])
+
+    # Recovering data from emotions
+    df = db_get_documents_by_range_time("Emotions", user_id, start_timestamp, current_timestamp, False)
+    print(df)
+
+    print(final_data)
+    return final_data

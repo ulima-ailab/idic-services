@@ -10,7 +10,7 @@ import dirname.managers.DataManager as dm
 from dirname.inference_engine.FuzzySystem import FuzzySystem
 from dirname.inference_engine.SVMModel import SVMmodel
 from dirname.inference_engine.enfs.enfs import ENFS
-from dirname.inference_engine.models import *
+from dirname.config_vars import *
 
 import os
 from dotenv import load_dotenv, find_dotenv
