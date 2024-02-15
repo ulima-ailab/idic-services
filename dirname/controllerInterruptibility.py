@@ -64,12 +64,9 @@ def export_interruptibility_raw(request):
     print(df_web_data)
 
     df_all = pd.concat([df_app_data, df_web_data], axis=1)
-    #df_all = df_all.drop(columns=['id_user_1', 'index'])
-
     df_all.to_csv(settings.STATIC_URL + "raw_interruptibility_data.csv")
     df_users.to_csv(settings.STATIC_URL + "raw_users_data.csv")
 
-    # Return the collection data as a JSON response
     return JsonResponse({"message": "Data exported"}, safe=False)
 
 
@@ -83,8 +80,8 @@ def predict(request):
     data = fsm.db_get_interruptibility_data(user_id, curr_timestamp)
     model = load(MODELS_PATH + os.environ.get('MODEL_INTERRUPTIBILITY_FILE'))
     scaler = load(MODELS_PATH + os.environ.get('SCALER_INTERRUPTIBILITY_FILE'))
-    print("Model loaded")
-
-    pred = 0
-    return JsonResponse({"message": "Prediction was successful", "data": pred})
-
+    print(data)
+    scaled = scaler.transform(data)
+    X_instance = pd.DataFrame(scaled, columns=data.columns)
+    y_pred = model.predict(X_instance)
+    return JsonResponse({"message": "Interruptibility was predicted", "output": int(y_pred[0])})

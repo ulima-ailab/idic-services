@@ -53,7 +53,6 @@ def db_get_documents_by_range_time(collection_name, user_id, start_timestamp, en
 
 
 def db_get_interruptibility_data(user_id, current_timestamp):
-    db = firestore.client()
     start_timestamp = current_timestamp - timedelta(minutes=int(5))
     print("STARTTT", start_timestamp)
 
@@ -62,8 +61,11 @@ def db_get_interruptibility_data(user_id, current_timestamp):
     emo_cols = ["neutral", "sad", "disgusted", "stress", "happy"]
 
     final_data = {}
+    for key in (app_cols + web_cols + emo_cols):
+        final_data[key] = -1
 
     # Recovering data from the context_app (android)
+    app_cols = app_cols + ["stress"]
     df = db_get_documents_by_range_time("Context_app", user_id, start_timestamp, current_timestamp, False)
     if len(df.columns) > 0:
         df = df[app_cols]
@@ -79,6 +81,11 @@ def db_get_interruptibility_data(user_id, current_timestamp):
     # Recovering data from emotions
     df = db_get_documents_by_range_time("Emotions", user_id, start_timestamp, current_timestamp, False)
     print(df)
+    if len(df.columns) > 0:
+        df = df.iloc[0:7]
+        print(df)
+        for idx in df.index:
+            if df['emotion'][idx] in emo_cols:
+                final_data[df['emotion'][idx]] = df['value'][idx]
 
-    print(final_data)
-    return final_data
+    return pd.DataFrame([final_data])
