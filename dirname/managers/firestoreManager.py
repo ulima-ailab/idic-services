@@ -18,7 +18,8 @@ def db_get_emotions(user_id, start_timestamp, end_timestamp):
     db = firestore.client()
 
     # Fetch the collection data from Firebase
-    docs = db.collection('Emotions').where('id_user', '==', user_id).where('timestamp', '>=', start_timestamp).where('timestamp', '<=', end_timestamp).get()
+    docs = db.collection('Emotions').where('id_user', '==', user_id).where('timestamp', '>=', start_timestamp).where(
+        'timestamp', '<=', end_timestamp).get()
 
     # Create a list to store the document data
     data = []
@@ -73,19 +74,29 @@ def db_get_interruptibility_data(user_id, current_timestamp):
 
     # Recovering data from context_web
     df = db_get_documents_by_range_time("Context_web", user_id, start_timestamp, current_timestamp, False)
-    print(df)
+    # print(df)
     if len(df.columns) > 0:
         df = df[web_cols]
         final_data.update(df.to_dict('records')[0])
 
     # Recovering data from emotions
     df = db_get_documents_by_range_time("Emotions", user_id, start_timestamp, current_timestamp, False)
-    print(df)
+    # print(df)
     if len(df.columns) > 0:
         df = df.iloc[0:7]
-        print(df)
+        # print(df)
         for idx in df.index:
             if df['emotion'][idx] in emo_cols:
                 final_data[df['emotion'][idx]] = df['value'][idx]
 
     return pd.DataFrame([final_data])
+
+
+def db_get_persuasive_messages(persuasion_level):
+    db = firestore.client()
+    doc = db.collection("Messages_Config").document(persuasion_level).get()
+    if doc.exists:
+        return doc.to_dict()
+    else:
+        print("No such document!")
+        return None

@@ -1,6 +1,8 @@
 import datetime
 import numpy as np
 import pandas as pd
+import random
+from datetime import datetime, timedelta
 from firebase_admin import firestore
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -15,23 +17,6 @@ from dirname.config_vars import *
 import os
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv(), override=True)
-
-
-def firebase_collection(request):
-    # Access the Firestore database
-    db = firestore.client()
-
-    # Fetch the collection data from Firebase
-    collection_ref = db.collection('TestCollection')
-    docs = collection_ref.get()
-
-    # Create a list to store the document data
-    data = []
-    for doc in docs:
-        data.append(doc.to_dict())
-
-    # Return the collection data as a JSON response
-    return JsonResponse(data, safe=False)
 
 
 @csrf_exempt
@@ -61,27 +46,31 @@ def upload_training_data(request):
     return JsonResponse({"message": "Data was inserted", "data": data})
 
 
-def generate_message(persuasion_level):
+def generate_message(user_id, current_time, persuasion_level):
     # Infer the modality
+    user_state = fsm.db_get_interruptibility_data(user_id, current_time)
+    message_obj = fsm.db_get_persuasive_messages(persuasion_level)
+
+    modality = "audio"
+    print(user_state)
+    if user_state["attention_level"][0] == 3 or user_state["stress_level"][0] == 5:
+        modality = "color"
+
     # Generate message object
-    import random
-    num = random.random()
-    if num > 0.65:
-        return {"type": "visual", "value": "red", "time": 3}
-    elif num > 0.3:
+    if modality == "color":
+        return {"type": "visual", "value": message_obj[modality], "time": 3}
+    elif modality == "audio":
+        idx = random.randint(0, NUM_AVAILABLE_MESSAGES - 1)
         return {"type": "audio",
-                "value": "https://drive.google.com/uc?export=download&id=13lrUpMAiqiznF9kk3LULLWtH3nf3ioAz", "time": 2}
-    else:
-        return {"type": "speech",
-                "value": "Por favor toma un descanso", "time": 1}
+                "value": message_obj["messages"][idx], "time": 1}
 
 
 @csrf_exempt
-def start_message_generation(request):
+def generate_persuasive_message(request):
     user_id = request.POST.get('userId')
-    current_time = request.POST.get('currentTime')
-    end_timestamp = datetime.datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S')
-    start_timestamp = end_timestamp - datetime.timedelta(minutes=int(os.environ.get('MINS_FOR_PERSUASION_INFERENCE')))
+    current_time = request.POST.get('currentTime') if request.POST.get('currentTime') else datetime.now()
+    end_timestamp = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S %Z%z')
+    start_timestamp = end_timestamp - timedelta(minutes=int(os.environ.get('MINS_FOR_PERSUASION_INFERENCE')))
 
     print("StartTime", start_timestamp)
     print("EndTime", end_timestamp)
@@ -111,7 +100,7 @@ def start_message_generation(request):
     result[LABEL_COL] = persuasion_level
 
     # generating the corresponding message
-    result["message"] = generate_message(persuasion_level)
+    result["message"] = generate_message(user_id, end_timestamp, persuasion_level)
     print("SERVER: " + persuasion_level)
 
     # Return the collection data as a JSON response

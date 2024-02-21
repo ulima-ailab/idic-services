@@ -21,11 +21,10 @@ import dirname.controllerInterruptibility as interruptibilityCalls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('firebase-collection/', firebase_collection, name='firebase_collection'),
     path('get-emotions/', get_emotions, name='get_emotions'),
-    path('start-message-generation/', start_message_generation, name='start_message_generation'),
     path('train-model/<str:model_id>/', train_model, name='train_model'),
     path('upload-training-data/', upload_training_data, name='upload_training_data'),
+    path('persuasion/generate/message', generate_persuasive_message, name='generate_persuasive_message'),
 
     path('firebase/interruptibility/training/raw', interruptibilityCalls.export_interruptibility_raw, name='export_interruptibility_data'),
     path('interruptibility/predict', interruptibilityCalls.predict, name='predict_interruptibility'),

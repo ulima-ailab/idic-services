@@ -1,8 +1,5 @@
-import random
-
 import requests
 import pandas as pd
-import numpy as np
 
 
 def recover_data_by_user(user_id, start_date, end_date):
