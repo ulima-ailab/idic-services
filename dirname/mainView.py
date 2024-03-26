@@ -8,7 +8,6 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 import dirname.managers.firestoreManager as fsm
-import dirname.managers.DataManager as dm
 from dirname.inference_engine.FuzzySystem import FuzzySystem
 from dirname.inference_engine.SVMModel import SVMmodel
 from dirname.inference_engine.enfs.enfs import ENFS
@@ -68,17 +67,23 @@ def generate_message(user_id, current_time, persuasion_level):
 @csrf_exempt
 def generate_persuasive_message(request):
     user_id = request.POST.get('userId')
-    current_time = request.POST.get('currentTime') if request.POST.get('currentTime') else datetime.now()
-    end_timestamp = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S %Z%z')
-    start_timestamp = end_timestamp - timedelta(minutes=int(os.environ.get('MINS_FOR_PERSUASION_INFERENCE')))
+    current_time_str = request.POST.get('currentTime')
+    end_timestamp = datetime.strptime(current_time_str, '%Y-%m-%d %H:%M:%S %Z%z')
+    start_timestamp = end_timestamp - timedelta(minutes=int(os.environ.get('MINS_RANGE_QUERY')))
 
     print("StartTime", start_timestamp)
     print("EndTime", end_timestamp)
 
-    data = fsm.db_get_emotions(user_id, start_timestamp, end_timestamp)
-    data = dm.preprocess_data(data)
-    result = {"emotion_data": data}
+    data = {}
+    emo_cols = ['angry', 'disgusted', 'fearful', 'happy', 'neutral', 'sad', 'stress', 'surprised']
+    df = fsm.db_get_documents_by_range_time("Emotions", user_id, start_timestamp, end_timestamp, False)
+    if len(df.columns) > 0:
+        df = df.iloc[0:8]
+        for idx in df.index:
+            if df['emotion'][idx] in emo_cols:
+                data[df['emotion'][idx]] = df['value'][idx]
 
+    result = {"emotion_data": data}
     model_id = os.environ.get('MODEL_PERSUASION_INFERENCE')
 
     if model_id == ENFS_MODEL:
