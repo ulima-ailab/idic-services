@@ -57,7 +57,7 @@ def generate_message(user_id, current_time, persuasion_level):
 
     # Generate message object
     if modality == "color":
-        return {"type": "visual", "value": message_obj[modality], "time": 3}
+        return {"type": "visual", "value": message_obj[modality], "time": 5}
     elif modality == "audio":
         idx = random.randint(0, NUM_AVAILABLE_MESSAGES - 1)
         return {"type": "audio",
