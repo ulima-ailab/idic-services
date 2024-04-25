@@ -89,5 +89,5 @@ def predict(request):
     send_log_firestore("interruptibility",
                        {"user_id": user_id, "current_time": curr_date},
                        data.to_dict('records')[0],
-                       int(y_pred[0]))
+                       1) # int(y_pred[0]))
     return JsonResponse({"message": "Interruptibility was predicted", "output": int(y_pred[0])})
