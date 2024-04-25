@@ -7,7 +7,7 @@ from firebase_admin import firestore
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-import dirname.managers.firestoreManager as fsm
+import dirname.shared.firestoreManager as fsm
 from dirname.inference_engine.FuzzySystem import FuzzySystem
 from dirname.inference_engine.SVMModel import SVMmodel
 from dirname.inference_engine.enfs.enfs import ENFS

@@ -5,7 +5,7 @@ from datetime import datetime
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-import dirname.managers.firestoreManager as fsm
+import dirname.shared.firestoreManager as fsm
 from dirname.config_vars import *
 
 from joblib import load
