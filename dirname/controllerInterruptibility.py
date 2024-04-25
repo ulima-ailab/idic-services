@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 import dirname.shared.firestoreManager as fsm
+from dirname.shared.logger import send_log_firestore
 from dirname.config_vars import *
 
 from joblib import load
@@ -84,4 +85,9 @@ def predict(request):
     scaled = scaler.transform(data)
     X_instance = pd.DataFrame(scaled, columns=data.columns)
     y_pred = model.predict(X_instance)
+
+    send_log_firestore("interruptibility",
+                       {"user_id": user_id, "current_time": curr_date},
+                       data.to_dict('records')[0],
+                       int(y_pred[0]))
     return JsonResponse({"message": "Interruptibility was predicted", "output": int(y_pred[0])})

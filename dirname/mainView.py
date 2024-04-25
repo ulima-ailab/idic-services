@@ -12,6 +12,7 @@ from dirname.inference_engine.FuzzySystem import FuzzySystem
 from dirname.inference_engine.SVMModel import SVMmodel
 from dirname.inference_engine.enfs.enfs import ENFS
 from dirname.config_vars import *
+from dirname.shared.logger import send_log_firestore
 
 import os
 from dotenv import load_dotenv, find_dotenv
@@ -56,13 +57,14 @@ def generate_message(user_id, current_time, persuasion_level):
         modality = "color"
 
     # Generate message object
+    msg_obj = None
     if modality == "color":
-        return {"type": "visual", "value": message_obj[modality], "time": 5}
+        msg_obj = {"type": "visual", "value": message_obj[modality], "time": 5}
     elif modality == "audio":
         idx = random.randint(0, NUM_AVAILABLE_MESSAGES - 1)
-        return {"type": "audio",
-                "value": message_obj["messages"][idx], "time": 1}
+        msg_obj = {"type": "audio", "value": message_obj["messages"][idx], "time": 1}
 
+    return msg_obj, {"attention_level": int(user_state["attention_level"][0]), "stress_level": int(user_state["stress_level"][0])}
 
 @csrf_exempt
 def generate_persuasive_message(request):
@@ -83,7 +85,6 @@ def generate_persuasive_message(request):
             if df['emotion'][idx] in emo_cols:
                 data[df['emotion'][idx]] = df['value'][idx]
 
-    result = {"emotion_data": data}
     model_id = os.environ.get('MODEL_PERSUASION_INFERENCE')
 
     if model_id == ENFS_MODEL:
@@ -100,14 +101,20 @@ def generate_persuasive_message(request):
     else:
         model = FuzzySystem()
 
+    result = {}
     # inferring the persuasion level
     persuasion_level = model.process_input(data)
     result[LABEL_COL] = persuasion_level
 
     # generating the corresponding message
-    result["message"] = generate_message(user_id, end_timestamp, persuasion_level)
+    msg_obj, user_state = generate_message(user_id, end_timestamp, persuasion_level)
+    result["message"] = msg_obj
     print("SERVER: " + persuasion_level)
 
+    send_log_firestore("persuasive_message",
+                       {"user_id": user_id, "current_time": current_time_str},
+                       {"infer_persuasion_level": data, "infer_type_message": user_state},
+                       {"persuasion_level": persuasion_level, "message": result["message"]})
     # Return the collection data as a JSON response
     return JsonResponse(result, safe=False)
 

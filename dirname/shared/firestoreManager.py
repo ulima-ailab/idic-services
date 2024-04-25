@@ -55,7 +55,6 @@ def db_get_documents_by_range_time(collection_name, user_id, start_timestamp, en
 
 def db_get_interruptibility_data(user_id, current_timestamp):
     start_timestamp = current_timestamp - timedelta(minutes=int(os.environ.get('MINS_RANGE_QUERY')))
-    print("STARTTT", start_timestamp)
 
     app_cols = ["surrounding_sound", "stress_level", "physical_activity"]
     web_cols = ["attention_level"]
