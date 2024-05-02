@@ -11,4 +11,4 @@ MODELS_PATH = settings.STATIC_URL + "models/"
 
 TRAINING_CSV_PATH = settings.STATIC_URL + "training_data.csv"
 
-NUM_AVAILABLE_MESSAGES = 6
+NUM_AVAILABLE_MESSAGES = 5

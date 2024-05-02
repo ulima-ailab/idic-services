@@ -56,15 +56,16 @@ def db_get_documents_by_range_time(collection_name, user_id, start_timestamp, en
 def db_get_interruptibility_data(user_id, current_timestamp):
     start_timestamp = current_timestamp - timedelta(minutes=int(os.environ.get('MINS_RANGE_QUERY')))
 
-    app_cols = ["surrounding_sound", "stress", "stress_level", "physical_activity"]
+    app_cols = ["surrounding_sound", "stress_level", "physical_activity"]
     web_cols = ["attention_level"]
-    emo_cols = ["neutral", "sad", "disgusted", "happy"]
+    emo_cols = ["neutral", "sad", "disgusted", "stress", "happy"]
 
     final_data = {}
     for key in (app_cols + web_cols + emo_cols):
         final_data[key] = -1
 
     # Recovering data from the context_app (android)
+    app_cols = app_cols + ["stress"]
     df = db_get_documents_by_range_time("Context_app", user_id, start_timestamp, current_timestamp, False)
     if len(df.columns) > 0:
         df = df[app_cols]
@@ -78,6 +79,7 @@ def db_get_interruptibility_data(user_id, current_timestamp):
         final_data.update(df.to_dict('records')[0])
 
     # Recovering data from emotions
+    emo_cols.remove("stress")
     df = db_get_documents_by_range_time("Emotions", user_id, start_timestamp, current_timestamp, False)
     # print(df)
     if len(df.columns) > 0:
