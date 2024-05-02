@@ -87,6 +87,8 @@ def generate_persuasive_message(request):
 
     model_id = os.environ.get('MODEL_PERSUASION_INFERENCE')
 
+    raw_data = data
+
     if model_id == ENFS_MODEL:
         model = ENFS()
         model.load_model(MODELS_PATH + "enfs_config")
@@ -113,7 +115,7 @@ def generate_persuasive_message(request):
 
     send_log_firestore("persuasive_message",
                        {"user_id": user_id, "current_time": current_time_str},
-                       {"infer_persuasion_level": data, "infer_type_message": user_state},
+                       {"infer_persuasion_level": raw_data, "infer_type_message": user_state},
                        {"persuasion_level": persuasion_level, "message": result["message"]})
     # Return the collection data as a JSON response
     return JsonResponse(result, safe=False)
