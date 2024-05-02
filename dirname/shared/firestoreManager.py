@@ -81,7 +81,7 @@ def db_get_interruptibility_data(user_id, current_timestamp):
     df = db_get_documents_by_range_time("Emotions", user_id, start_timestamp, current_timestamp, False)
     # print(df)
     if len(df.columns) > 0:
-        df = df.iloc[0:7]
+        df = df.iloc[0:8]
         # print(df)
         for idx in df.index:
             if df['emotion'][idx] in emo_cols:
