@@ -75,6 +75,8 @@ def export_interruptibility_raw(request):
 
 @csrf_exempt
 def predict(request):
+    global cont
+    
     user_id = request.POST.get('userId')
     curr_date = request.POST.get('currentTime') if request.POST.get('currentTime') else datetime.now()
     curr_timestamp = datetime.strptime(curr_date, '%Y-%m-%d %H:%M:%S %Z%z')
