@@ -11,6 +11,8 @@ from dirname.config_vars import *
 
 from joblib import load
 
+cont = 0
+
 
 @csrf_exempt
 def export_interruptibility_raw(request):
@@ -86,8 +88,10 @@ def predict(request):
     X_instance = pd.DataFrame(scaled, columns=data.columns)
     y_pred = model.predict(X_instance)
 
+    cont = cont + 1
+
     send_log_firestore("interruptibility",
-                       {"user_id": user_id, "current_time": curr_date},
+                       {"user_id": user_id, "current_time": curr_date, "counter": cont},
                        data.to_dict('records')[0],
                        int(y_pred[0]))
     return JsonResponse({"message": "Interruptibility was predicted", "output": int(y_pred[0])})
