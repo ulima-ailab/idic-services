@@ -78,22 +78,27 @@ def predict(request):
     global cont
     
     user_id = request.POST.get('userId')
-    curr_date = request.POST.get('currentTime') if request.POST.get('currentTime') else datetime.now()
-    curr_timestamp = datetime.strptime(curr_date, '%Y-%m-%d %H:%M:%S %Z%z')
-    print("CurrentTime", curr_timestamp)
+    curr_date = request.POST.get('currentTime')
 
-    data = fsm.db_get_interruptibility_data(user_id, curr_timestamp)
-    model = load(MODELS_PATH + os.environ.get('MODEL_INTERRUPTIBILITY_FILE'))
-    scaler = load(MODELS_PATH + os.environ.get('SCALER_INTERRUPTIBILITY_FILE'))
-    print(data)
-    scaled = scaler.transform(data)
-    X_instance = pd.DataFrame(scaled, columns=data.columns)
-    y_pred = model.predict(X_instance)
+    if user_id and curr_date:
+        curr_timestamp = datetime.strptime(curr_date, '%Y-%m-%d %H:%M:%S %Z%z')
+        print("CurrentTime", curr_timestamp)
 
-    cont = cont + 1
+        data = fsm.db_get_interruptibility_data(user_id, curr_timestamp)
+        model = load(MODELS_PATH + os.environ.get('MODEL_INTERRUPTIBILITY_FILE'))
+        scaler = load(MODELS_PATH + os.environ.get('SCALER_INTERRUPTIBILITY_FILE'))
+        print(data)
+        scaled = scaler.transform(data)
+        X_instance = pd.DataFrame(scaled, columns=data.columns)
+        y_pred = model.predict(X_instance)
 
-    send_log_firestore("interruptibility",
-                       {"user_id": user_id, "current_time": curr_date, "counter": cont},
-                       data.to_dict('records')[0],
-                       int(y_pred[0]))
-    return JsonResponse({"message": "Interruptibility was predicted", "output": int(y_pred[0])})
+        cont = cont + 1
+
+        send_log_firestore("interruptibility",
+            {"user_id": user_id, "current_time": curr_date, "counter": cont},
+            data.to_dict('records')[0],
+            int(y_pred[0])
+        )
+        return JsonResponse({"message": "Interruptibility was predicted", "output": int(y_pred[0])}, status=200)
+    else:
+        return JsonResponse({"message": "Missing parameters"}, status=400)

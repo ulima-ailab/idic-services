@@ -70,55 +70,59 @@ def generate_message(user_id, current_time, persuasion_level):
 def generate_persuasive_message(request):
     user_id = request.POST.get('userId')
     current_time_str = request.POST.get('currentTime')
-    end_timestamp = datetime.strptime(current_time_str, '%Y-%m-%d %H:%M:%S %Z%z')
-    start_timestamp = end_timestamp - timedelta(minutes=int(os.environ.get('MINS_RANGE_QUERY')))
 
-    print("StartTime", start_timestamp)
-    print("EndTime", end_timestamp)
+    if user_id and current_time_str:
+        end_timestamp = datetime.strptime(current_time_str, '%Y-%m-%d %H:%M:%S %Z%z')
+        start_timestamp = end_timestamp - timedelta(minutes=int(os.environ.get('MINS_RANGE_QUERY')))
 
-    data = {}
-    emo_cols = ['angry', 'disgusted', 'fearful', 'happy', 'neutral', 'sad', 'stress', 'surprised']
-    df = fsm.db_get_documents_by_range_time("Emotions", user_id, start_timestamp, end_timestamp, False)
-    if len(df.columns) > 0:
-        df = df.iloc[0:8]
-        for idx in df.index:
-            if df['emotion'][idx] in emo_cols:
-                data[df['emotion'][idx]] = df['value'][idx]
+        print("StartTime", start_timestamp)
+        print("EndTime", end_timestamp)
 
-    model_id = os.environ.get('MODEL_PERSUASION_INFERENCE')
+        data = {}
+        emo_cols = ['angry', 'disgusted', 'fearful', 'happy', 'neutral', 'sad', 'stress', 'surprised']
+        df = fsm.db_get_documents_by_range_time("Emotions", user_id, start_timestamp, end_timestamp, False)
+        if len(df.columns) > 0:
+            df = df.iloc[0:8]
+            for idx in df.index:
+                if df['emotion'][idx] in emo_cols:
+                    data[df['emotion'][idx]] = df['value'][idx]
 
-    raw_data = data
+        model_id = os.environ.get('MODEL_PERSUASION_INFERENCE')
 
-    if model_id == ENFS_MODEL:
-        model = ENFS()
-        model.load_model(MODELS_PATH + "enfs_config")
-        tmp = pd.DataFrame([data])
-        data = np.array(tmp[FEATURES_COLS])
-        data = np.array([data])
-    elif model_id == SVM_MODEL:
-        model = SVMmodel()
-        model.load_model(MODELS_PATH + "svm_config")
-        tmp = pd.DataFrame([data])
-        data = np.array(tmp[FEATURES_COLS])
+        raw_data = data
+
+        if model_id == ENFS_MODEL:
+            model = ENFS()
+            model.load_model(MODELS_PATH + "enfs_config")
+            tmp = pd.DataFrame([data])
+            data = np.array(tmp[FEATURES_COLS])
+            data = np.array([data])
+        elif model_id == SVM_MODEL:
+            model = SVMmodel()
+            model.load_model(MODELS_PATH + "svm_config")
+            tmp = pd.DataFrame([data])
+            data = np.array(tmp[FEATURES_COLS])
+        else:
+            model = FuzzySystem()
+
+        result = {}
+        # inferring the persuasion level
+        persuasion_level = model.process_input(data)
+        result[LABEL_COL] = persuasion_level
+
+        # generating the corresponding message
+        msg_obj, user_state = generate_message(user_id, end_timestamp, persuasion_level)
+        result["message"] = msg_obj
+        print("SERVER: " + persuasion_level)
+
+        send_log_firestore("persuasive_message",
+                           {"user_id": user_id, "current_time": current_time_str},
+                           {"infer_persuasion_level": raw_data, "infer_type_message": user_state},
+                           {"persuasion_level": persuasion_level, "message": result["message"]})
+        # Return the collection data as a JSON response
+        return JsonResponse(result, safe=False, status=200)
     else:
-        model = FuzzySystem()
-
-    result = {}
-    # inferring the persuasion level
-    persuasion_level = model.process_input(data)
-    result[LABEL_COL] = persuasion_level
-
-    # generating the corresponding message
-    msg_obj, user_state = generate_message(user_id, end_timestamp, persuasion_level)
-    result["message"] = msg_obj
-    print("SERVER: " + persuasion_level)
-
-    send_log_firestore("persuasive_message",
-                       {"user_id": user_id, "current_time": current_time_str},
-                       {"infer_persuasion_level": raw_data, "infer_type_message": user_state},
-                       {"persuasion_level": persuasion_level, "message": result["message"]})
-    # Return the collection data as a JSON response
-    return JsonResponse(result, safe=False)
+        return JsonResponse({"message": "Missing parameters"}, status=400)
 
 
 @csrf_exempt
