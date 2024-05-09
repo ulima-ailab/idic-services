@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 import dirname.shared.firestoreManager as fsm
-from dirname.shared.logger import send_log_firestore
+from dirname.shared.logger import send_log_to_firestore
 from dirname.config_vars import *
 
 from joblib import load
@@ -94,7 +94,7 @@ def predict(request):
 
         cont = cont + 1
 
-        send_log_firestore("interruptibility",
+        send_log_to_firestore("interruptibility",
             {"user_id": user_id, "current_time": curr_date, "counter": cont},
             data.to_dict('records')[0],
             int(y_pred[0])

@@ -12,7 +12,7 @@ from dirname.inference_engine.FuzzySystem import FuzzySystem
 from dirname.inference_engine.SVMModel import SVMmodel
 from dirname.inference_engine.enfs.enfs import ENFS
 from dirname.config_vars import *
-from dirname.shared.logger import send_log_firestore
+from dirname.shared.logger import send_log_to_firestore
 
 import os
 from dotenv import load_dotenv, find_dotenv
@@ -115,7 +115,7 @@ def generate_persuasive_message(request):
         result["message"] = msg_obj
         print("SERVER: " + persuasion_level)
 
-        send_log_firestore("persuasive_message",
+        send_log_to_firestore("persuasive_message",
                            {"user_id": user_id, "current_time": current_time_str},
                            {"infer_persuasion_level": raw_data, "infer_type_message": user_state},
                            {"persuasion_level": persuasion_level, "message": result["message"]})
